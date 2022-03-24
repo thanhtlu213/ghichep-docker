@@ -1,0 +1,40 @@
+-----------------------------------Uninstall docker on centos7--------------------------------
+
+1. First query all installed packages
+
+	yum list installed | grep docker*
+or
+	rpm -qa docker*
+
+-----------------------------------------------------------------------------------
+2. Delete the package
+
+# There will be one in general
+	yum remove -y docker-ce
+
+# 18.09 new CLI tool
+	yum remove -y docker-ce-cli
+
+-----------------------------------------------------------------------------------
+3. Delete the image file
+
+	rm -rf /var/lib/docker*
+	rm -rf /var/lib/containerd
+
+
+
+
+
+-----------------------------------Uninstall docker on ubuntu--------------------------------
+
+1. Uninstall the Docker Engine, CLI, and Containerd packages:
+
+	sudo apt-get purge docker-ce docker-ce-cli containerd.io
+
+-----------------------------------------------------------------------------------
+
+2. Images, containers, volumes, or customized configuration files on your host are not automatically removed. To delete all images, containers, and volumes:
+
+	sudo rm -rf /var/lib/docker*
+	sudo rm -rf /var/lib/containerd
+

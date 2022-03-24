@@ -1,0 +1,56 @@
+-----------------------Install Docker------------------------
+
+1. Install docker with script 
+
+	curl -fsSL https://get.docker.com/ | sh
+
+or  
+	curl -fsSL https://get.docker.com -o get-docker.sh
+	sudo sh get-docker.sh
+
+---------------------------------------------
+2. Start docker
+
+	sudo systemctl start docker
+	sudo systemctl status docker
+	sudo systemctl enable docker
+
+---------------------------------------------
+3. Check status docker
+
+	docker --version
+	systemctl status docker
+
+---------------------------------------------
+4. Add your user to the docker group
+
+	sudo usermod -aG docker $USER
+
+---------------------------------------------
+
+5. Edit IP docker
+	
+	sudo bash -c 'touch /etc/docker/daemon.json' && sudo bash -c "echo -e \"{\n\t\\\"bip\\\": \\\"55.55.1.1/24\\\"\n}\" > /etc/docker/daemon.json"
+
+Link: 
+https://docs.docker.com/engine/install/centos/
+https://docs.docker.com/engine/install/ubuntu/
+
+
+-----------------Install Docker-Compose-------------------
+
+1. Run this command to download the current stable release of Docker Compose:
+
+	sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+ 
+---------------------------------------------
+2. Apply executable permissions to the binary:
+
+	sudo chmod +x /usr/local/bin/docker-compose
+
+---------------------------------------------
+3. Test the installation:
+	
+	docker-compose --version
+
+
