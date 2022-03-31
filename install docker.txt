@@ -49,7 +49,10 @@ https://docs.docker.com/engine/install/ubuntu/
 	sudo chmod +x /usr/local/bin/docker-compose
 
 ---------------------------------------------
-3. Test the installation:
+3. Set the binary executable path
+	sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+
+4. Verify installation:
 	
 	docker-compose --version
 
