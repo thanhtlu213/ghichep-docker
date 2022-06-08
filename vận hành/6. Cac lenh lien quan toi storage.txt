@@ -1,0 +1,15 @@
+### Các lệnh cơ bản liên quan tới container ###
+
+--- Tạo volume
+docker volume create [OPTIONS] [VOLUME]
+docker volume create nginx-data
+
+--- Xem danh sách các volume
+docker volume ls 
+
+--- Xóa volume đang không sử dụng
+docker volume prune
+
+--- Xóa volume 
+docker volume rm [OPTIONS] VOLUME [VOLUME...]
+docker volume rm nginx-data

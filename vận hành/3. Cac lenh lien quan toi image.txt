@@ -1,0 +1,75 @@
+### Các lệnh cơ bản liên quan tới image ###
+
+--- Đăng nhập vào docker/hub
+docker login -u username -p password
+docker login -u hoanbc -p devops123
+
+--- Kéo image từ registry về máy
+docker pull [OPTIONS] NAME[:TAG|@DIGEST]
+docker image pull [OPTIONS] NAME[:TAG|@DIGEST]
+docker pull nginx
+docker image pull nginx:latest
+
+--- Đẩy image từ máy lên registry
+docker push [OPTIONS] NAME[:TAG]
+docker image push [OPTIONS] NAME[:TAG]
+docker push hoanbc/project01:v1
+docker image push hoanbc/project01:v1
+
+--- Build image từ docker filesystem
+docker build [OPTIONS] PATH | URL | -
+docker image build [OPTIONS] PATH | URL | -
+docker build -f docker-file.yml
+docker image build -f docker-file.yml
+
+--- Tạo image từ container
+docker commit [OPTIONS] CONTAINER [REPOSITORY[:TAG]]
+docker commit -m "Centos Project01" -a "HoanBC" d452f1a1b69d hoanbc/project01:v1
+
+--- Kiểm tra lịch sử của image
+docker history [OPTIONS] IMAGE
+docker image history [OPTIONS] IMAGE
+docker history nginx
+docker image history nginx
+
+--- Gán thẻ tag vào image
+docker tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
+docker image tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
+docker tag nginx:latest hoanbc/nginx:v1
+docker image tag nginx:latest hoanbc/nginx:v1
+
+--- Export image ra file
+docker save [OPTIONS] IMAGE [IMAGE...]
+docker image save [OPTIONS] IMAGE [IMAGE...]
+docker save nginx:latest -o nginx-export.tar
+docker image save nginx:latest -o nginx-export.tar
+
+--- Import image từ file
+docker import [OPTIONS] file|URL|- [REPOSITORY[:TAG]]
+docker image import [OPTIONS] file|URL|- [REPOSITORY[:TAG]]
+docker import nginx:latest -i nginx-export.tar
+docker image import nginx:latest -i nginx-export.tar
+
+--- Xem các thông số liên quan tới image
+docker inspect [OPTIONS] NAME|ID [NAME|ID...]
+docker image inspect [OPTIONS] NAME|ID [NAME|ID...]
+docker inspect nginx
+docker image inspect nginx:latest
+
+--- Liệt kê các image đang có
+docker images
+docker image ls
+
+--- Xóa image
+docker rmi [OPTIONS] IMAGE [IMAGE...]
+docker image rm [OPTIONS] IMAGE [IMAGE...]
+docker rmi nginx
+docker image rm nginx
+
+--- Xóa tất cả các image đang không được sử dụng
+docker image prune
+
+----------------------------------------------
+--- Xóa toàn bộ image
+docker rmi -f $(docker images -a -q)
+----------------------------------------------

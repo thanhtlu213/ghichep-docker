@@ -1,0 +1,36 @@
+### Các lệnh cơ bản liên quan tới network ###
+
+--- Tạo một docker network
+docker network create [OPTIONS] NETWORK
+docker network create --subnet 192.168.2.0/24 --driver bridge front-end
+Note: 
+	--driver bridge: mapping mạng container vào mạng interface vật lý
+	--drive host: container chỉ kết nối được những container khác ở cùng mạng
+	--drive none: cô lập hoàn toàn container
+	--drive overlay: sử dụng mạng overlay để kết nối các container giữa các node với nhau(docker-swarm)
+
+--- Kiểm tra các cấu hình trên một network
+docker network inspect [OPTIONS] NETWORK [NETWORK...]
+docker network inspect front-end
+
+--- Liệt kê các mạng đang tồn tại
+docker network ls
+
+--- Xem cấu hình của network
+docker network inspect [OPTIONS] NETWORK [NETWORK...]
+docker network inspect front-end
+
+--- Xóa mạng đang tồn tại
+docker network rm NETWORK [NETWORK...]
+docker network rm front-end
+
+--- Xóa tất cả các network đang không được sử dụng
+docker network prune
+
+--- Gán mạng vào trong container
+docker network connect [OPTIONS] NETWORK CONTAINER
+docker network connect front-end container-nginx
+
+--- Gỡ mạng ra khỏi container
+docker network disconnect [OPTIONS] NETWORK CONTAINER
+docker network disconnect front-end container-nginx

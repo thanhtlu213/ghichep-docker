@@ -1,0 +1,22 @@
+### Sử dụng portainer quản trị tập chung môi trường docker
+
+1) Cài đặt docker
+
+2) Khởi chạy portainer
+docker run -d -p 8080:8000 -p 9000:9000 --name=portainer --restart=always-v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce
+
+3) Mở firewalld
+firewalld-cmd --add-port=9000/tcp --permanent
+firewalld-cmd --reload
+
+4) Đăng ký 	Endpoints
+- Truy cập vào trang quản trị portainer:9000
+- Home -> Endpoints -? Add Endpoints
+	1) Nếu Docker chạy Stander Alone -> Chọn Docker 
+		- Name: Tên máy chủ Docker
+		- Endpoint URL: địa chỉ IP hoặc Url của Docker cần add vào quản trị kèm port 2375
+	2) Nếu Docker chạy Cluster Swarm -> Chọn Agent
+		- Chạy lệnh sau trên Manager Swarm
+			curl -L https://downloads.portainer.io/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent
+		- Name: Tên máy chủ trong cụm Cluster Swarm
+		- Endpoint URL: địa chỉ IP hoặc Url của Docker cần add vào quản trị kèm port 9001

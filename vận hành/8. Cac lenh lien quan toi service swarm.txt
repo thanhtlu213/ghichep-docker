@@ -1,0 +1,52 @@
+### Các lệnh cơ bản liên quan tới service swarm ###
+
+Note:
+   --replicates: chỉ thực hiện tạo container trên các node worker -> phục vụ cho các dịch vụ
+   --mode global: thực hiện tạo container trên tất cả các node -> phục vụ cho việc cài đặt các condition liên quan tới giám sát tại node
+
+--- Tạo service
+docker service create [OPTIONS] IMAGE [COMMAND] [ARG...]
+docker service create -d --name container-nginx -p 8080:80 -v nginx-data:/usr/share/nginx/html --limit-memory 2048m --limit-cpu 1 --restart-condition on-failure --network front-end-overlay --env WHOAMI=hoanbc --replicates=3  nginx
+Note:
+-d : Chạy container ở chế độ nền
+-t : Tạo TTY giả
+--name container-nginx : Đặt tên container thành container-nginx
+-p 8080:80 : Gán port 8080 của Host với port 80 của container
+-v nginx-data:/usr/share/nginx/html : Gán volume trên Host vào thư mục /usr/share/nginx/html của container
+--limit-memory 2048m : Giới hạn dung lượng Memory cho container
+--limit-cpu 1 : Giới hạn Core sử dụng cho container
+--cpuset-cpus 0-1 : Giới hạn vị trí Core sẽ sử dụng cho container
+--restart-condition on-failure : Khởi động lại nếu container không ở trạng thái RUNNING 
+--network front-end-overlay : Kết nối vào mạng docker
+--env WHOAMI=hoanbc : Thêm biến vào trong docker
+--replicates=3 : Số lượng container sẽ thực hiện deploy trên worker
+nginx : Image sẽ sử dụng để khởi tạo container
+
+
+--- Xem cấu hình của service
+docker service inspect [OPTIONS] SERVICE [SERVICE...]
+docker service inspect container-nginx 
+
+--- Xem log của service
+docker service logs [OPTIONS] SERVICE|TASK
+docker service -f container-nginx 
+
+--- Liệt kê các service
+docker service ls
+
+--- Xóa service
+docker service rm SERVICE [SERVICE...]
+docker service rm container-nginx
+
+--- Cập nhật service
+docker service update [OPTIONS] SERVICE
+docker service update --replicates=4 container-nginx
+docker service update --network back-end-overlay  container-nginx
+
+--- Tăng số lượng container replicates của service
+docker service scale SERVICE=REPLICAS [SERVICE=REPLICAS...]
+docker service scale container-nginx=10
+
+--- Khôi phục lại trạng thái trước khi thực hiện update
+docker service rollback [OPTIONS] SERVICE
+docker service rollback container-nginx

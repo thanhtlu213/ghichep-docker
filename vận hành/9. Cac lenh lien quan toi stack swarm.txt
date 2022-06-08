@@ -1,0 +1,21 @@
+### Các lệnh cơ bản liên quan tới stack ###
+
+Note: Cần phải sử dụng docker-compose với định dạng version 3
+
+--- Tạo stack 
+docker stack deploy [OPTIONS] STACK
+docker stack deploy -c docker-compose.yml container-nginx
+
+--- Liệt kê các stack
+docker stack ls
+
+--- Liệt kê các tiến trình trong stack
+docker stack ps
+
+--- Xóa stack
+docker stack rm [OPTIONS] STACK [STACK...]
+docker stack rm container-nginx
+
+--- Liệt kê các dịch vụ trong stack
+docker stack services [OPTIONS] STACK
+docker stack services container-nginx

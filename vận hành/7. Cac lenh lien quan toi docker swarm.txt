@@ -1,0 +1,46 @@
+### Các lệnh cơ bản liên quan tới cluster swarm ###
+
+Note: Mô hình đảm bảo HA tối thiếu yêu cầu 3 node Manager với tỉ lệ fail node là 1. Nó dựa trên công thức node/2 + 1.
+
+--- Khởi tạo cluster swarm ( trên node Manager )
+docker swarm init [OPTIONS]
+docker swarm init --advertise-addr 192.168.1.0
+
+--- Lấy token để join thêm các Manager vào cluster swarm (chạy trên node manager)
+docker swarm join-token manager
+Note: lúc này trên console sẽ xuất một chuỗi thông tin, lấy nó và chạy trên các node Manager khác
+
+--- Lấy token để join thêm các Worker vào swarm (chạy trên node manager)
+docker swarm join-token worker
+Note: lúc này trên console sẽ xuất một chuỗi thông tin, lấy nó và chạy trên các node Worker
+
+--- Rời node ra khỏi cluster swarm
+docker swarm leave -f
+
+--- Khi cluster swarm có 3 node mà bị fail node 2 và không thể khôi phục. Tiến hành force lại trạng thái của cluster trên node Manager còn sống
+docker swam init --force-new-cluster
+
+--- Nâng role của worker lên thành manager
+docker node promote NODE [NODE...]
+docker node promote worker-1
+
+--- Hạ role của manager xuống thành worker
+docker node demote NODE [NODE...]
+docker node demote manager-1
+
+--- Xóa node ra khỏi cluster swam
+docker node rm [OPTIONS] NODE [NODE...]
+docker node rm -f manager-1
+
+--- Ngắt tạm thời node ra khỏi cluster swarm
+docker node update [OPTIONS] NODE
+docker node update --drain active manager-1
+--- Tham gia lại node đã ngắt ra khỏi cluster swarm
+docker node update --availability active manager-1
+
+
+--- Liệt kê các node trong cluster
+docker node ls
+
+--- Liệt kê các container đang chạy trên cluster
+docker node ps

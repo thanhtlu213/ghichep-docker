@@ -1,0 +1,20 @@
+### Các lệnh liên quan tới hệ thống docker
+
+--- Cho phép truy cập và điều khiển Docker Node từ xa
+vim /lib/systemd/system/docker.service
+From: ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+Change To: ExecStart=/usr/bin/dockerd -H fd:// -H=tcp://0.0.0.0:2375 --containerd=/run/containerd/containerd.sock
+
+systemctl daemon-reload
+systemctl restart docker
+
+firewall-cmd --add-port=2375/tcp --permanent
+firewall-cmd --reload
+
+--- Kiểm tra phiên bản và các thông số của Docker
+docker -v
+docker system info
+docker-compose version
+
+
+
