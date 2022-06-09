@@ -1,0 +1,13 @@
+Error starting daemon: Error initializing network controller: list bridge addresses failed: no available network
+
+-----------------------------------------------------
+Apr 19 11:29:38 ytcc-his-old-11 dockerd[3317]: time="2022-04-19T11:29:38.055388167+07:00" level=info msg="Firewalld: docker zone already exists, returning"
+Apr 19 11:29:38 ytcc-his-old-11 dockerd[3317]: time="2022-04-19T11:29:38.444831578+07:00" level=info msg="stopping event stream following graceful shutdown" error="<nil>" module=libcontainerd namespace=moby
+Apr 19 11:29:38 ytcc-his-old-11 dockerd[3317]: failed to start daemon: Error initializing network controller: list bridge addresses failed: PredefinedLocalScopeDefaultNetworks List: [172.17.0.0/16 172.18.0.0/16 172.19.0.0/16 172.20.0.0/16 172.21.0.0/16 172.22.0.0/16 172.23.0.0/16 172.24.0.0/16 172.25.0.0/16 172.26.0.0/16 172.27.0.0/16 172.28.0.0/16 172.29.0.0/16 172.30.0.0/16 172.31.0.0/16 192.168.0.0/20 192.168.16.0/20 192.168.32.0/20 192.168.48.0/20 192.168.64.0/20 192.168.80.0/20 192.168.96.0/20 192.168.112.0/20 192.168.128.0/20 192.168.144.0/20 192.168.160.0/20 192.168.176.0/20 192.168.192.0/20 192.168.208.0/20 192.168.224.0/20 192.168.240.0/20]: no available network
+-----------------------------------------------------
+
+
+fix: 
+ip link add name docker0 type bridge
+ip addr add dev docker0 172.17.0.1/16
+systemctl restart docker
