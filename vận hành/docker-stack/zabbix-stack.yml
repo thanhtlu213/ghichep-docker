@@ -1,0 +1,153 @@
+version: "3.7"
+networks:
+  net:
+    driver: overlay
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.16.238.0/24
+services:
+  dba:
+    image: mysql:8.0-oracle
+    command:
+      - mysqld
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_bin
+      - --skip-character-set-client-handshake
+      - --default-authentication-plugin=mysql_native_password
+    volumes:
+      - "/data/zabbix/dba:/var/lib/mysql:rw"
+    environment:
+      - MYSQL_ROOT_PASSWORD=zabbix_admin
+      - MYSQL_DATABASE=zabbix
+      - MYSQL_USER=zabbix
+      - MYSQL_PASSWORD=zabbix
+      - MYSQL_ALLOW_EMPTY_PASSWORD=false
+    stop_grace_period: 1m
+    networks:
+      - net
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+  app:
+    image: zabbix/zabbix-server-mysql:alpine-latest
+    ports:
+      - "10051:10051"
+    depends_on:
+      - dba
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/data/zabbix/env/alertscripts:/usr/lib/zabbix/alertscripts:ro"
+      - "/data/zabbix/env/externalscripts:/usr/lib/zabbix/externalscripts:ro"
+      - "/data/zabbix/env/export:/var/lib/zabbix/export:rw"
+      - "/data/zabbix/env/modules:/var/lib/zabbix/modules:ro"
+      - "/data/zabbix/env/enc:/var/lib/zabbix/enc:ro"
+      - "/data/zabbix/env/ssh_keys:/var/lib/zabbix/ssh_keys:ro"
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+    environment:
+      - DB_SERVER_HOST=dba
+      - MYSQL_USER=zabbix
+      - MYSQL_PASSWORD=zabbix
+      - MYSQL_ROOT_PASSWORD=zabbix_admin
+      - MYSQL_DATABASE=zabbix
+      - ZBX_DEBUGLEVEL=3
+    depends_on:
+      - dba
+    networks:
+      net:
+        aliases:
+          - zabbix-server
+    stop_grace_period: 30s
+    sysctls:
+      - net.ipv4.ip_local_port_range=1024 65000
+      - net.ipv4.conf.all.accept_redirects=0
+      - net.ipv4.conf.all.secure_redirects=0
+      - net.ipv4.conf.all.send_redirects=0
+  web:
+    image: zabbix/zabbix-web-apache-mysql:alpine-latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - dba
+      - app
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/data/zabbix/web/apache2:/etc/ssl/apache2:ro"
+      - "/data/zabbix/web/modules:/usr/share/zabbix/modules/:ro"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+      replicas: 1
+      placement:
+        constraints: [node.role == worker]
+    environment:
+      - ZBX_SERVER_HOST=zabbix-server
+      - ZBX_SERVER_NAME="My System Monitoring"
+      - PHP_TZ=Asia/Ho_Chi_Minh
+      - DB_SERVER_HOST=dba
+      - MYSQL_USER=zabbix
+      - MYSQL_PASSWORD=zabbix
+      - MYSQL_DATABASE=zabbix
+    depends_on:
+      - dba
+      - app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    networks:
+      - net
+    stop_grace_period: 10s
+    sysctls:
+      - net.core.somaxconn=65535
+  agent:
+    image: zabbix/zabbix-agent2:alpine-latest
+    hostname: '{{.Node.Hostname}}'
+    volumes:
+      - "/data/zabbix/env/zabbix_agentd.d:/etc/zabbix/zabbix_agentd.d:ro"
+      - "/data/zabbix/env/enc:/var/lib/zabbix/enc:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 128M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+      mode: global
+    environment:
+      - ZBX_PASSIVESERVERS=172.16.238.0/24,app-01.example.local
+      - ZBX_METADATA=Linux
+      - ZBX_ACTIVE_ALLOW=false
+    privileged: true
+    pid: "host"
+    networks:
+      - net
